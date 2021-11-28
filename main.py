@@ -17,6 +17,7 @@ top = tkinter.Tk()
 def open_dataset():
     global filename 
     filename = askopenfilename()
+    result.set("Loaded dataset !")
 
 def traindt():
     global filename
@@ -30,7 +31,7 @@ def traindt():
         train_decision_tree(data,cf.get(),result)
     except Exception as e:
         print(e)
-        result.set("Please load a dataset first !")
+        result.set("Error: "+str(e))
 def trainlr():
     global filename
     global result
@@ -41,7 +42,7 @@ def trainlr():
         train_linear_regression(data,cf.get(),result)
     except Exception as e:
         print(e)
-        result.set("Please load a dataset first !")
+        result.set("Error: "+str(e))
 def traingnb():
     global filename
     global result
@@ -52,7 +53,7 @@ def traingnb():
         train_gaussian_naive_bayes(data,cf.get(),result)
     except Exception as e:
         print(e)
-        result.set("Please load a dataset first !")
+        result.set("Error: "+str(e))
 
 cf = IntVar()
 result = StringVar()

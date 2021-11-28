@@ -10,12 +10,14 @@ def preprocess(file):
     for row in range(len(data)):
         for value in range(len(data[row])):
             data[row][value] = data[row][value].strip()
-            if(any(l.isalpha() for l in data[row][value])):
+            if(any(l.isalpha() for l in data[row][value]) | any(l in "!\"#$%&'()*+,/:;<=>?@[\]^_`{|}~" for l in data[row][value])):
                 column = data[row].index(data[row][value])
                 if(data[row][value] not in nomial_column_values[column]):
                     nomial_column_values[column].append(data[row][value])
                 data[row][value] = nomial_column_values[column].index(data[row][value])
             else:
+                if(data[row][value]==""):
+                    raise Exception("Missing values in dataset !")
                 data[row][value] = float(data[row][value])
     print("Nominal data detected: ")
     for key,value in nomial_column_values.items():
