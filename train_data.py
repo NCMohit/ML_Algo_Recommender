@@ -88,6 +88,9 @@ def train_gaussian_naive_bayes(data,hascf,result):
         feature_set = []
         max_accuracy_feature = 0
         max_accuracy = 0
+        features_strs = []
+        accs = []
+        best_feature = ""
         for i in range(10):
             old_acc = max_accuracy
             for feature in range(1,10):
@@ -99,7 +102,11 @@ def train_gaussian_naive_bayes(data,hascf,result):
                     clf = clf.fit(X_train, Y_train)
                     Predicted_Y = clf.predict(X_test)
                     acc = metrics.accuracy_score(Y_test, Predicted_Y)
-
+                    features_str = ""
+                    for f in feature_set + [feature]:
+                        features_str += str(f)
+                    features_strs.append(features_str)
+                    accs.append(acc)
                     if(acc > max_accuracy):
                         max_accuracy_feature = feature_set + [feature]
                         max_accuracy = acc
@@ -109,6 +116,11 @@ def train_gaussian_naive_bayes(data,hascf,result):
             print("Feature set: ",feature_set)
             if(max_accuracy - old_acc <= 0):
                 break
+        plt.xlabel("Feature columns")
+        plt.ylabel("Accuracies")
+        plt.xticks(rotation=90)
+        plt.plot(features_strs,accs)
+        plt.show()
         feature_set_string = "["
         for feat in feature_set:
             feature_set_string += str(feat)

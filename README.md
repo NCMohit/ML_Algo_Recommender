@@ -9,6 +9,7 @@ https://www.kaggle.com/fedesoriano/heart-failure-prediction
 GUI : Tkinter
 ML Models : Sklearn
 All dataset columns are converted from nominal to integer.
+Various classifier parameters are iterated over to find the parameter value with best accuracy results
 ```
 
 ### Installation and Usage
