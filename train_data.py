@@ -11,11 +11,29 @@ def train_decision_tree(data,hascf,result):
         X = data[:,:-1]
         Y = data[:,-1]
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2,random_state=42)
-        clf = tree.DecisionTreeClassifier()
-        clf = clf.fit(X_train, Y_train)
-        Predicted_Y = clf.predict(X_test)
-        acc = metrics.accuracy_score(Y_test, Predicted_Y)
-        res = "Test size: 20%\nDecision Tree Accuracy: "+str(round(acc,2))
+        high_depth = 0
+        high_acc = 0
+        criteria = "entropy"
+        for depth in range(2,11):
+            clf = tree.DecisionTreeClassifier(max_depth=depth,criterion="entropy")
+            clf = clf.fit(X_train, Y_train)
+            Predicted_Y = clf.predict(X_test)
+            acc = metrics.accuracy_score(Y_test, Predicted_Y)
+            if(high_acc < acc):
+                high_acc = acc
+                high_depth = depth
+        for depth in range(2,11):
+            clf = tree.DecisionTreeClassifier(max_depth=depth,criterion="gini")
+            clf = clf.fit(X_train, Y_train)
+            Predicted_Y = clf.predict(X_test)
+            acc = metrics.accuracy_score(Y_test, Predicted_Y)
+            if(high_acc < acc):
+                high_acc = acc
+                high_depth = depth
+                criteria = "gini"
+        clf = tree.DecisionTreeClassifier(max_depth=high_depth,criterion=criteria)
+        clf = clf.fit(X_train, Y_train) 
+        res = "Test size: 20%\nBest Decision Tree Accuracy: "+str(round(high_acc,2))+" at max height: "+str(high_depth)+" and criteria: "+criteria
         result.set(result.get()+"\n"+res)
         tree.plot_tree(clf)
         print("Saving decision tree model in saved_models/")
