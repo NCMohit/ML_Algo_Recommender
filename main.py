@@ -1,7 +1,7 @@
 import tkinter
 from tkinter import *
 from tkinter.filedialog import askopenfilename
-from train_data import train_decision_tree, train_linear_regression, train_gaussian_naive_bayes, train_knn, train_svm
+from train_data import train_decision_tree, train_linear_regression, train_gaussian_naive_bayes, train_knn, train_svm, train_dbscan
 import numpy as np
 from preprocess_data import preprocess
 import os
@@ -71,11 +71,22 @@ def trainsvm():
     global result
     global cf
     global data
-    # try:
-    train_svm(data,cf.get(),result)
-    # except Exception as e:
-    #     print(e)
-    #     result.set("Error: "+str(e))   
+    try:
+        train_svm(data,cf.get(),result)
+    except Exception as e:
+        print(e)
+        result.set("Error: "+str(e)) 
+
+def traindbscan():
+    global filename
+    global result
+    global cf
+    global data
+    try:
+        train_dbscan(data,cf.get(),result)
+    except Exception as e:
+        print(e)
+        result.set("Error: "+str(e))      
 
 cf = IntVar()
 result = StringVar()
@@ -88,6 +99,7 @@ tlg = tkinter.Button(top, text ="Linear Regression", command = trainlr)
 tgnb = tkinter.Button(top, text ="Gaussian Naive Bayes", command = traingnb)
 tknn = tkinter.Button(top, text ="K Nearest Neighbours", command = trainknn)
 tsvm = tkinter.Button(top, text ="SVM", command = trainsvm)
+tdbscan = tkinter.Button(top, text ="DBSCAN", command = traindbscan)
 
 ld.pack()
 hcf.pack()
@@ -96,6 +108,7 @@ tlg.pack()
 tgnb.pack()
 tknn.pack()
 tsvm.pack()
+tdbscan.pack()
 reslabel.pack()
 
 ld.place(x=25,y=25)
@@ -105,6 +118,7 @@ tlg.place(x=150,y=100)
 tgnb.place(x=300,y=100)
 tknn.place(x=25,y=140)
 tsvm.place(x=200,y=140)
+tdbscan.place(x=275,y=140)
 reslabel.place(x=25,y=180)
 
 top.title("ML Algo recommender")

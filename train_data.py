@@ -2,7 +2,7 @@ from sklearn import tree, svm, metrics
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, DBSCAN
 from sklearn.metrics import silhouette_score
 import matplotlib.pyplot as plt
 import pickle
@@ -76,6 +76,8 @@ def train_linear_regression(data,hascf,result):
         plt.scatter(xtest, ypred, color="blue", linewidth=3)
         plt.xticks(())
         plt.yticks(())
+        plt.xlabel("First feature values")
+        plt.ylabel("Class feature values")
         plt.show()
 
         print("Saving linear regression model in saved_models/")
@@ -227,3 +229,48 @@ def train_svm(data,hascf,result):
     else:
         res = "No class feature set, Support Vector Machine"
         result.set(result.get()+"\n"+res)
+
+def plot_dbscan(min_samples,X,subplot):
+    global max_min_samples
+    global max_eps
+    global max_dbscan_score
+    silhouettes = []
+    for eps in range(10,21):
+        dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+        dbscan.fit_predict(X)
+        # print(dbscan.labels_)
+        score = silhouette_score(X, dbscan.labels_, metric='euclidean')
+        silhouettes.append(score)
+        if(max_dbscan_score < score):
+            max_dbscan_score = score
+            max_eps = eps
+            max_min_samples = min_samples
+    plt.subplot(2,2,subplot)
+    plt.xlabel("Min samples: "+str(min_samples)+", Epsilon Values")
+    plt.ylabel("Silhouette Scores")
+    plt.plot(range(10,21),silhouettes)
+
+def train_dbscan(data,hascf,result):
+    global max_min_samples
+    global max_eps
+    global max_dbscan_score
+    X = data[:,:]
+    if(hascf):
+        print("Has class feature, not considerg class feature column")
+        X = data[:,:-1]
+    max_eps = 0
+    max_min_samples = 0
+    max_dbscan_score = 0
+
+    plot_dbscan(9,X,1)
+    plot_dbscan(10,X,2)
+    plot_dbscan(11,X,3)
+    plot_dbscan(12,X,4)
+    plt.show()
+    res = "Best DBSCAN Silhouette score: "+str(round(max_dbscan_score,3))+" at eps value: "+str(max_eps)+" and min_samples: "+str(max_min_samples)
+    result.set(result.get()+"\n"+res)
+    dbscan = DBSCAN(eps=max_eps, min_samples=max_min_samples)
+    dbscan.fit_predict(X)
+    print("Saving knn in saved_models/")
+    with open('saved_models/dbscan.pkl', 'wb') as file:
+        pickle.dump(dbscan, file)
