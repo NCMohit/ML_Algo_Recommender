@@ -1,12 +1,12 @@
-from sklearn import tree
+from sklearn import tree, svm, metrics
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-from sklearn import metrics
 import matplotlib.pyplot as plt
 import pickle
+import numpy as np
 
 def train_decision_tree(data,hascf,result):
     if(hascf):
@@ -68,10 +68,12 @@ def train_linear_regression(data,hascf,result):
         Y_pred = reg.predict(X_test)
         result.set(result.get()+"\n"+"Linear regression score: "+str(round(reg.score(X_test,Y_test),2)))
 
-        ytest = [i[0] for i in Y_test]
-        ypred = [i[0] for i in Y_pred]
-        plt.scatter(range(len(X_test)), ytest, color="black")
-        plt.plot(range(len(X_test)), ypred, color="blue", linewidth=3)
+        xtest = np.squeeze(np.asarray(X_test[:,4]))
+        ypred = np.squeeze(np.asarray(Y_pred[:,0]))
+        ytest = np.squeeze(np.asarray(Y_test[:,0]))
+
+        plt.scatter(xtest, ytest, color="black")
+        plt.scatter(xtest, ypred, color="blue", linewidth=3)
         plt.xticks(())
         plt.yticks(())
         plt.show()
@@ -159,6 +161,69 @@ def train_knn(data,hascf,result):
     plt.show()
     res = "Best K Means Silhouette score: "+str(round(max_score,3))+" at k value: "+str(max_k)
     result.set(result.get()+"\n"+res)
-    print("Saving decision tree model in saved_models/")
+    print("Saving knn in saved_models/")
     with open('saved_models/kmeans.pkl', 'wb') as file:
         pickle.dump(kmeans, file)
+
+def plot_svm_kernel(C,kernel,subplot,X_train,X_test,Y_train,Y_test):
+    global high_C
+    global high_acc
+    global high_gamma
+    global high_kernel
+    gamma = 0.1
+    gamma_vals = []
+    accs = []
+    while(gamma <= 1):
+        model = svm.SVC(kernel=kernel, gamma=gamma, C=C)
+        clf = model.fit(X_train,np.squeeze(np.asarray(Y_train)))
+        
+        Predicted_Y = clf.predict(X_test)
+        accuracy = metrics.accuracy_score(Y_test, Predicted_Y)
+        accs.append(accuracy)
+        if(high_acc < accuracy):
+            high_acc = accuracy
+            high_gamma = gamma
+            high_C = C
+            high_kernel = kernel
+        gamma_vals.append(gamma)
+        gamma += 0.1
+    plt.subplot(2,2,subplot)
+    plt.xlabel("C="+str(C)+" gamma values "+kernel+" kernel SVM")
+    plt.ylabel("Accuracies")
+    plt.plot(gamma_vals,accs)
+
+def train_svm(data,hascf,result):
+    global high_C
+    global high_acc
+    global high_gamma
+    global high_kernel
+    if(hascf):
+        X = data[:,:-1]
+        Y = data[:,-1]
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2,random_state=42)
+        high_gamma = 0
+        high_C = 0
+        high_acc = 0
+
+        plot_svm_kernel(0.1,'rbf',1,X_train, X_test, Y_train, Y_test)
+        plot_svm_kernel(1,'rbf',2,X_train, X_test, Y_train, Y_test)
+        plot_svm_kernel(10,'rbf',3,X_train, X_test, Y_train, Y_test)
+        plot_svm_kernel(100,'rbf',4,X_train, X_test, Y_train, Y_test)
+
+        # plot_svm_kernel(0.1,'linear',5,X_train, X_test, Y_train, Y_test)
+        # plot_svm_kernel(1,'linear',6,X_train, X_test, Y_train, Y_test)
+        # plot_svm_kernel(10,'linear',7,X_train, X_test, Y_train, Y_test)
+        # plot_svm_kernel(100,'linear',8,X_train, X_test, Y_train, Y_test)
+        plt.show()
+
+        model = svm.SVC(kernel=high_kernel, gamma=high_gamma, C=high_C)
+        clf = model.fit(X_train,Y_train)
+
+        res = "Best SVM Accuracy: "+str(round(high_acc,3))+" at C value: "+str(high_C)+" at gamma value: "+str(high_gamma)
+        result.set(result.get()+"\n"+res)
+        print("Saving SVM Model in saved_models/")
+        with open('saved_models/svm.pkl', 'wb') as file:
+            pickle.dump(clf, file)
+    else:
+        res = "No class feature set, Support Vector Machine"
+        result.set(result.get()+"\n"+res)
