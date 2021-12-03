@@ -2,6 +2,8 @@ from sklearn import tree
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 from sklearn import metrics
 import matplotlib.pyplot as plt
 import pickle
@@ -14,11 +16,14 @@ def train_decision_tree(data,hascf,result):
         high_depth = 0
         high_acc = 0
         criteria = "entropy"
+        entropy_accs = []
+        gini_accs = []
         for depth in range(2,11):
             clf = tree.DecisionTreeClassifier(max_depth=depth,criterion="entropy")
             clf = clf.fit(X_train, Y_train)
             Predicted_Y = clf.predict(X_test)
             acc = metrics.accuracy_score(Y_test, Predicted_Y)
+            entropy_accs.append(acc)
             if(high_acc < acc):
                 high_acc = acc
                 high_depth = depth
@@ -27,12 +32,22 @@ def train_decision_tree(data,hascf,result):
             clf = clf.fit(X_train, Y_train)
             Predicted_Y = clf.predict(X_test)
             acc = metrics.accuracy_score(Y_test, Predicted_Y)
+            gini_accs.append(acc)
             if(high_acc < acc):
                 high_acc = acc
                 high_depth = depth
                 criteria = "gini"
         clf = tree.DecisionTreeClassifier(max_depth=high_depth,criterion=criteria)
         clf = clf.fit(X_train, Y_train) 
+        plt.subplot(1,2,1)
+        plt.xlabel("Entropy depths")
+        plt.ylabel("Accuracies")
+        plt.plot(range(2,11),entropy_accs)
+        plt.subplot(1,2,2)
+        plt.xlabel("Gini depths")
+        plt.ylabel("Accuracies")
+        plt.plot(range(2,11),gini_accs)
+        plt.show()
         res = "Test size: 20%\nBest Decision Tree Accuracy: "+str(round(high_acc,2))+" at max height: "+str(high_depth)+" and criteria: "+criteria
         result.set(result.get()+"\n"+res)
         tree.plot_tree(clf)
@@ -107,3 +122,31 @@ def train_gaussian_naive_bayes(data,hascf,result):
             pickle.dump(clf, file)
     else:
         print("No class feature, skipping Gaussian Naive Bayes")
+
+def train_knn(data,hascf,result):
+    X = data[:,:]
+    if(hascf):
+        print("Has class feature, not considerg class feature column")
+        X = data[:,:-1]
+    max_k = 0
+    max_score = 0
+    silhouettes = []
+    for k in range(2,11):
+        kmeans = KMeans(n_clusters=k)
+        kmeans.fit_predict(X)
+        score = silhouette_score(X, kmeans.labels_, metric='euclidean')
+        silhouettes.append(score)
+        if(max_score < score):
+            max_score = score
+            max_k = k
+    kmeans = KMeans(n_clusters=max_k)
+    kmeans.fit_predict(X)
+    plt.xlabel("K Values")
+    plt.ylabel("Silhouette Scores")
+    plt.plot(range(2,11),silhouettes)
+    plt.show()
+    res = "Best K Means Silhouette score: "+str(round(max_score,3))+" at k value: "+str(max_k)
+    result.set(result.get()+"\n"+res)
+    print("Saving decision tree model in saved_models/")
+    with open('saved_models/kmeans.pkl', 'wb') as file:
+        pickle.dump(kmeans, file)
