@@ -98,7 +98,7 @@ result = StringVar()
 
 reslabel = Label( top, textvariable=result, relief=RAISED )
 ld = tkinter.Button(top, text ="Load Data", command = open_dataset)
-hcf = tkinter.Checkbutton(top, text="Has Feature column", variable=cf, onvalue=1, offvalue=0)
+hcf = tkinter.Checkbutton(top, text="Has Label column", variable=cf, onvalue=1, offvalue=0)
 tdt = tkinter.Button(top, text ="Decision Tree", command = traindt)
 tlg = tkinter.Button(top, text ="Linear Regression", command = trainlr)
 tgnb = tkinter.Button(top, text ="Gaussian Naive Bayes", command = traingnb)
