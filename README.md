@@ -1,5 +1,6 @@
 ## Machine Learning algorithm recommender
 
+Recommends best algorithm for given dataset
 Dataset taken from Kaggle
 https://www.kaggle.com/fedesoriano/heart-failure-prediction
 
