@@ -18,12 +18,16 @@ top = tkinter.Tk()
 def open_dataset():
     global filename 
     global data
-    filename = askopenfilename()
-    result.set("Loaded dataset !")
-    data = preprocess(filename)
-    data = np.matrix(data)
-    print("\nFinal data: ")
-    print(data)
+    try:
+        filename = askopenfilename()
+        result.set("Loaded dataset !")
+        data = preprocess(filename)
+        data = np.matrix(data)
+        print("\nFinal data: ")
+        print(data)
+    except Exception as e:
+        print(e)
+        result.set("Error: "+str(e))
 
 def traindt():
     global filename
