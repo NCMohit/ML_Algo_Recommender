@@ -5,6 +5,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.metrics import silhouette_score
 import matplotlib.pyplot as plt
+import matplotlib
 import pickle
 import numpy as np
 
@@ -40,17 +41,18 @@ def train_decision_tree(data,hascf,result):
         clf = tree.DecisionTreeClassifier(max_depth=high_depth,criterion=criteria)
         clf = clf.fit(X_train, Y_train) 
         plt.subplot(1,2,1)
-        plt.xlabel("Entropy depths")
+        plt.xlabel("Entropy max depths")
         plt.ylabel("Accuracies")
         plt.plot(range(2,11),entropy_accs)
         plt.subplot(1,2,2)
-        plt.xlabel("Gini depths")
+        plt.xlabel("Gini max depths")
         plt.ylabel("Accuracies")
         plt.plot(range(2,11),gini_accs)
         plt.show()
-        res = "Test size: 20%\nBest Decision Tree Accuracy: "+str(round(high_acc,2))+" at max height: "+str(high_depth)+" and criteria: "+criteria
+        res = "Test size: 20%\nBest Decision Tree Accuracy: "+str(round(high_acc,2))+" at max depth: "+str(high_depth)+" and criteria: "+criteria
         result.set(result.get()+"\n"+res)
-        tree.plot_tree(clf)
+        plt.figure(figsize=(12,7))
+        tree.plot_tree(clf, fontsize=8)
         print("Saving decision tree model in saved_models/")
         with open('saved_models/decision_tree.pkl', 'wb') as file:
             pickle.dump(clf, file)

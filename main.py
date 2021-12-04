@@ -1,4 +1,5 @@
 import tkinter
+import tkinter.font as tkFont
 from tkinter import *
 from tkinter.filedialog import askopenfilename
 from train_data import train_decision_tree, train_linear_regression, train_gaussian_naive_bayes, train_knn, train_svm, train_dbscan
@@ -101,6 +102,17 @@ tknn = tkinter.Button(top, text ="K Nearest Neighbours", command = trainknn)
 tsvm = tkinter.Button(top, text ="SVM", command = trainsvm)
 tdbscan = tkinter.Button(top, text ="DBSCAN", command = traindbscan)
 
+reslabel.config(font=('Helvatical bold',15))
+ld.config(font=('Helvatical bold',15))
+hcf.config(font=('Helvatical bold',15))
+tdt.config(font=('Helvatical bold',15))
+tlg.config(font=('Helvatical bold',15))
+tgnb.config(font=('Helvatical bold',15))
+tknn.config(font=('Helvatical bold',15))
+tsvm.config(font=('Helvatical bold',15))
+tdbscan.config(font=('Helvatical bold',14))
+
+
 ld.pack()
 hcf.pack()
 tdt.pack()
@@ -114,13 +126,13 @@ reslabel.pack()
 ld.place(x=25,y=25)
 hcf.place(x=25,y=70)
 tdt.place(x=25,y=100)
-tlg.place(x=150,y=100)
-tgnb.place(x=300,y=100)
+tlg.place(x=200,y=100)
+tgnb.place(x=420,y=100)
 tknn.place(x=25,y=140)
-tsvm.place(x=200,y=140)
-tdbscan.place(x=275,y=140)
-reslabel.place(x=25,y=180)
+tsvm.place(x=285,y=140)
+tdbscan.place(x=370,y=140)
+reslabel.place(x=25,y=200)
 
 top.title("ML Algo recommender")
-top.geometry("500x400")
+top.geometry("800x600")
 top.mainloop()
